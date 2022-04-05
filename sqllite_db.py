@@ -1,3 +1,4 @@
+from datetime import datetime
 import sqlite3
 
 
@@ -26,6 +27,6 @@ class SqlStorage:
     def load_from_db(self, start, end_):
         """получаем из базы значения в интревале start -> end"""
         cursor = self._connection.cursor()
-        cursor.execute('select * from historydata where date >= start and date < end_')
+        cursor.execute('select * from historydata where date >= ' + start + ' and date < ' + end_)
         result = cursor.fetchall()
         return result
