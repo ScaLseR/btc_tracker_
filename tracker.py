@@ -12,5 +12,6 @@ def get_args():
     print(args.end)
     print(args.N)
 
+
 if __name__ == "__main__":
     get_args()
