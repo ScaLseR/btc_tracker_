@@ -1,8 +1,8 @@
 import sqlite3
 
 
-class Sqldata:
-
+class SqlStorage:
+    """класс создания и работы с БД sqlite3"""
     def __init__(self, db_name='tracker'):
         """присваиваем имя нашей БД, настраиваем коннект"""
         self._db_name = db_name
@@ -12,13 +12,20 @@ class Sqldata:
     def _cr_table(self):
         """если таблицы нет - создаем, если уже есть то пропускаем"""
         cursor = self._connection.cursor()
-        cursor.execute('create table if not exist (date text, price real, unique(date))')
+        cursor.execute('create table if not exist historydata(date text, price real, unique(date))')
         self._connection.commit()
 
-    def save_to_db(self, data):
-        """сохраняем в базу значения"""
-        pass
+    def save_to_db(self, data: dict):
+        """сохраняем в базу значения data"""
+        cursor = self._connection.cursor()
+        for key, value in data.items():
+            cursor.execute('insert or ignore into historydata(date, price) values (?, ?)',
+                           (key, value))
+        self._connection.commit()
 
-    def load_from_db(self, start, end):
+    def load_from_db(self, start, end_):
         """получаем из базы значения в интревале start -> end"""
-        pass
+        cursor = self._connection.cursor()
+        cursor.execute('select * from historydata where date >= start and date < end_')
+        result = cursor.fetchall()
+        return result
