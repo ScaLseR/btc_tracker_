@@ -4,7 +4,7 @@ import sqlite3
 
 class SqlStorage:
     """класс создания и работы с БД sqlite3"""
-    def __init__(self, db_name='Name'):
+    def __init__(self, db_name='DefaultName'):
         """присваиваем имя нашей БД, настраиваем коннект"""
         self._db_name = db_name
         self._connection = sqlite3.connect(self._db_name)
@@ -28,7 +28,10 @@ class SqlStorage:
         """получаем из базы значения в интревале start -> end"""
         cursor = self._connection.cursor()
         cursor.execute("select * from historydata where date >= " + "'" + str(start) +
-                       "'" + " and date <= " + "'" + str(end) + "'")
+                       "'" + " and date < " + "'" + str(end) + "'")
         result = cursor.fetchall()
         self._connection.commit()
-        return result
+        data_dict = {}
+        for data in result:
+            data_dict[data[0]] = data[1]
+        return data_dict
