@@ -24,7 +24,7 @@ class SqlStorage:
                            (key, value))
         self._connection.commit()
 
-    def load_from_db(self, start: datetime, end: datetime):
+    def load_from_db(self, start: datetime, end: datetime) -> dict:
         """получаем из базы значения в интревале start -> end"""
         cursor = self._connection.cursor()
         cursor.execute("select * from historydata where date >= " + "'" + str(start) +

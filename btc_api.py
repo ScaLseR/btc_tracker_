@@ -13,8 +13,10 @@ class BtcApi:
         """get запрос к API"""
         print('Выполняем запрос к API с ' + str(start) + ' по ' + str(end))
         response = requests.get(self._url, params={'start': str(start), 'end': str(end)})
-        resp = json.loads(response.content)
         dict_resp = {}
+        if not response:
+            return dict_resp
+        resp = json.loads(response.content)
         for key, value in resp['bpi'].items():
             dict_resp[key] = value
         return dict_resp

@@ -1,13 +1,26 @@
 from datetime import datetime, timedelta
-import argparse
 from sqllite_db import SqlStorage
 from btc_api import BtcApi
 from draw_graph import draw_graph
+import argparse
 
 
 def find_first_valid_data():
     """находим первую валидную дату с ценой"""
-    pass
+    date_format = "%Y-%m-%d"
+    start = datetime.strptime('2008-01-01', date_format).date()
+    end = datetime.strptime('2022-01-01', date_format).date()
+    n = 30
+    api = BtcApi(n)
+    while (end - start).days != 3:
+        center = start + timedelta(days=((end - start)/2).days)
+        print(center)
+        data_from_api = api.load_start_end(center + timedelta(days=-1), center + timedelta(days=+1))
+        if len(data_from_api) == 3:
+            end -= timedelta(days=((end - start)/2).days)
+        else:
+            start += timedelta(days=((end - start)/2).days)
+    print('Первая валидный день исторических данных: ', str(start))
 
 
 def get_data_by_time_interval(start, end, n):
