@@ -12,8 +12,7 @@ def find_first_valid_data():
     date_format = "%Y-%m-%d"
     start = datetime.strptime('2000-01-01', date_format).date()
     end = datetime.strptime('2022-01-01', date_format).date()
-    num = 30
-    api = BtcApi(num)
+    api = BtcApi()
     while (end - start).days != 3:
         center = start + timedelta(days=((end - start)/2).days)
         data_from_api = api.load_start_end(center + timedelta(days=-1), center + timedelta(days=+1))

@@ -4,9 +4,9 @@ import json
 import requests
 
 
-class BtcApi:# pylint: disable=too-few-public-methods
+class BtcApi: #pylint: disable=too-few-public-methods
     """класс для работы с Api https://old.coindesk.com/coindesk-api"""
-    def __init__(self, n_interval):
+    def __init__(self, n_interval=30):
         self._url = 'https://api.coindesk.com/v1/bpi/historical/close.json'
         self._n_interval = n_interval
 
