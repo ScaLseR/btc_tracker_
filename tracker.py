@@ -54,7 +54,7 @@ def get_args():
         find_first_valid_data()
 
     if args.start and args.end and args.n and not args.fv:
-        if args.num >= 100:
+        if args.n >= 100:
             num = int(input('Введите N < 100 '))
         else:
             num = args.n
