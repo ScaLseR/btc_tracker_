@@ -6,7 +6,7 @@ from btc_api import BtcApi
 from draw_graph import draw_graph
 
 
-def find_first_valid_data(start, end):
+def find_first_valid_data(start: datetime.date, end: datetime.date):
     """находим первую валидную дату с ценой"""
     api = BtcApi()
     while (end - start).days != 3:
@@ -21,7 +21,7 @@ def find_first_valid_data(start, end):
     print('Первая валидный день исторических данных: ', str(start))
 
 
-def get_data_by_time_interval(start, end, num):
+def get_data_by_time_interval(start: datetime.date, end: datetime.date, num: int):
     """получаем данные за период <n, сначала смотрим в базе
     , если нет то отправляем запрос к API"""
     storage = SqlStorage('test')
@@ -35,10 +35,30 @@ def get_data_by_time_interval(start, end, num):
         draw_graph(data_from_api)
 
 
-def convert_arg(arg):
+def convert_to_date(arg: str) -> datetime.date:
     """конвертируем полученные аргументы в формат даты"""
     date_format = "%Y-%m-%d"
     return datetime.strptime(arg, date_format).date()
+
+
+def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: int):
+    """минимизация получения данных с API """
+    data_interval_list = []
+    storage = SqlStorage('test')
+    data_from_storage = storage.load_from_db(start, end)
+    key_list = list(data_from_storage)
+    if start < convert_to_date(key_list[0]):
+        data_interval_list.append([start, convert_to_date(key_list[0])])
+    if end > convert_to_date(key_list[-1]):
+        data_interval_list.append([convert_to_date(key_list[-1]), end])
+    for i in range(len(key_list) - 1):
+        if (convert_to_date(key_list[i + 1]) - convert_to_date(key_list[i])).days > 1:
+            data_interval_list.append([convert_to_date(key_list[i]), convert_to_date(key_list[i + 1])])
+    api = BtcApi(num)
+    for date in data_interval_list:
+        data_from_api = api.load_start_end(date[0], date[1])
+        storage.save_to_db(data_from_api)
+    draw_graph(storage.load_from_db(start, end))
 
 
 def get_args():
@@ -54,11 +74,13 @@ def get_args():
     args = parser.parse_args()
     #отработка аргумента --fv поиска первой валидной даты
     if args.fv and args.start and args.end:
-        find_first_valid_data(convert_arg(args.start), convert_arg(args.end))
+        find_first_valid_data(convert_to_date(args.start), convert_to_date(args.end))
     #отработка аргументов --start --end --n для построения графика цены BTC
-    if args.start and args.end and args.n and not args.fv:
-        get_data_by_time_interval(convert_arg(args.start), convert_arg(args.end), args.n)
-
+    if args.start and args.end and args.n and not args.fv and not args.md:
+        get_data_by_time_interval(convert_to_date(args.start), convert_to_date(args.end), args.n)
+    #отработка аргументов --start --end --n --md с минимизацией запрашиваемых данных
+    if args.start and args.end and args.n and args.md and not args.fv:
+        get_data_min_time_interval(convert_to_date(args.start), convert_to_date(args.end), args.n)
 
 if __name__ == "__main__":
     get_args()
