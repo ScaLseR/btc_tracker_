@@ -6,12 +6,8 @@ from btc_api import BtcApi
 from draw_graph import draw_graph
 
 
-
-def find_first_valid_data():
+def find_first_valid_data(start, end):
     """находим первую валидную дату с ценой"""
-    date_format = "%Y-%m-%d"
-    start = datetime.strptime('2000-01-01', date_format).date()
-    end = datetime.strptime('2022-01-01', date_format).date()
     api = BtcApi()
     while (end - start).days != 3:
         center = start + timedelta(days=((end - start)/2).days)
@@ -39,28 +35,31 @@ def get_data_by_time_interval(start, end, num):
         draw_graph(data_from_api)
 
 
+def convert_arg(arg):
+    """конвертируем полученные аргументы в формат даты"""
+    date_format = "%Y-%m-%d"
+    return datetime.strptime(arg, date_format).date()
+
+
 def get_args():
     """ Получаем и обрабатываем аргументы командной строки"""
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('--start', type=str, default=False, help='Input start date: yyyy-mm-dd')
     parser.add_argument('--end', type=str, default=False, help='Input end date: yyyy-mm-dd')
     parser.add_argument('--n', type=int, default=False, help='Input N < 100')
-    parser.add_argument('--fv', default=False, help='Finding the first '
-                                                    'valid day of historical data')
+    parser.add_argument('--fv', action='store_const', const=True, default=False,
+                        help='Finding the first valid day of historical data')
     args = parser.parse_args()
 
-    if args.fv and not args.start and not args.end and not args.n:
-        find_first_valid_data()
+    if args.fv and args.start and args.end:
+        find_first_valid_data(convert_arg(args.start), convert_arg(args.end))
 
     if args.start and args.end and args.n and not args.fv:
         if args.n >= 100:
             num = int(input('Введите N < 100 '))
         else:
             num = args.n
-        date_format = "%Y-%m-%d"
-        start = datetime.strptime(args.start, date_format).date()
-        end = datetime.strptime(args.end, date_format).date()
-        get_data_by_time_interval(start, end, num)
+        get_data_by_time_interval(convert_arg(args.start), convert_arg(args.end), num)
 
 
 if __name__ == "__main__":
