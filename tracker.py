@@ -53,7 +53,8 @@ def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: in
         data_interval_list.append([convert_to_date(key_list[-1]), end])
     for i in range(len(key_list) - 1):
         if (convert_to_date(key_list[i + 1]) - convert_to_date(key_list[i])).days > 1:
-            data_interval_list.append([convert_to_date(key_list[i]), convert_to_date(key_list[i + 1])])
+            data_interval_list.append([convert_to_date(key_list[i]),
+                                       convert_to_date(key_list[i + 1])])
     api = BtcApi(num)
     for date in data_interval_list:
         data_from_api = api.load_start_end(date[0], date[1])
@@ -63,14 +64,14 @@ def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: in
 
 def get_args():
     """ Получаем и обрабатываем аргументы командной строки"""
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description='BTC Tracker')
     parser.add_argument('--start', type=str, default=False, help='Input start date: yyyy-mm-dd')
     parser.add_argument('--end', type=str, default=False, help='Input end date: yyyy-mm-dd')
     parser.add_argument('--n', type=int, default=False, help='Input N < 100')
     parser.add_argument('--fv', action='store_true', default=False,
                         help='Finding the first valid day of historical data')
     parser.add_argument('--md', action='store_true', default=False,
-                        help='min data from api')
+                        help='Get min data from api')
     args = parser.parse_args()
     #отработка аргумента --fv поиска первой валидной даты
     if args.fv and args.start and args.end:
