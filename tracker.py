@@ -41,6 +41,15 @@ def convert_arg(arg):
     return datetime.strptime(arg, date_format).date()
 
 
+def control_n(arg):
+    """обработка ввода аргумента --n"""
+    if arg >= 100:
+        num = int(input('Введите N < 100 '))
+    else:
+        num = arg
+    return num
+
+
 def get_args():
     """ Получаем и обрабатываем аргументы командной строки"""
     parser = argparse.ArgumentParser(description='')
@@ -49,17 +58,15 @@ def get_args():
     parser.add_argument('--n', type=int, default=False, help='Input N < 100')
     parser.add_argument('--fv', action='store_const', const=True, default=False,
                         help='Finding the first valid day of historical data')
+    parser.add_argument('--md', action='store_const', const=True, default=False,
+                        help='min data from api')
     args = parser.parse_args()
-
+    #отработка аргумента --fv поиска первой валидной даты
     if args.fv and args.start and args.end:
         find_first_valid_data(convert_arg(args.start), convert_arg(args.end))
-
+    #отработка аргументов --start --end --n для построения графика цены BTC
     if args.start and args.end and args.n and not args.fv:
-        if args.n >= 100:
-            num = int(input('Введите N < 100 '))
-        else:
-            num = args.n
-        get_data_by_time_interval(convert_arg(args.start), convert_arg(args.end), num)
+        get_data_by_time_interval(convert_arg(args.start), convert_arg(args.end), control_n(args.n))
 
 
 if __name__ == "__main__":
