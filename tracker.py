@@ -72,16 +72,22 @@ def get_args():
                         help='Finding the first valid day of historical data')
     parser.add_argument('--md', action='store_true', default=False,
                         help='Get min data from api')
+    parser.add_argument('--mr', action='store_true', default=False,
+                        help='Get min requests to api')
     args = parser.parse_args()
     #отработка аргумента --fv поиска первой валидной даты
     if args.fv and args.start and args.end:
         find_first_valid_data(convert_to_date(args.start), convert_to_date(args.end))
-    #отработка аргументов --start --end --n для построения графика цены BTC
-    if args.start and args.end and args.n and not args.fv and not args.md:
-        get_data_by_time_interval(convert_to_date(args.start), convert_to_date(args.end), args.n)
-    #отработка аргументов --start --end --n --md с минимизацией запрашиваемых данных
-    if args.start and args.end and args.n and args.md and not args.fv:
-        get_data_min_time_interval(convert_to_date(args.start), convert_to_date(args.end), args.n)
+    if args.start and args.end and args.n:
+        # отработка аргументов --start --end --n построение графика BTC
+        if not args.mr and not args.fv and not args.md:
+            get_data_by_time_interval(convert_to_date(args.start),
+                                      convert_to_date(args.end), args.n)
+        # отработка аргументов --start --end --n --md с минимизацией запрашиваемых данных
+        if args.md and not args.fv and not args.mr:
+            get_data_min_time_interval(convert_to_date(args.start),
+                                       convert_to_date(args.end), args.n)
+
 
 if __name__ == "__main__":
     get_args()
