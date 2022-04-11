@@ -17,5 +17,10 @@ def draw_graph(data: dict):
     if len(x_coord) == 1:
         plt.scatter(x_coord, y_coord, color='g')
     else:
-        plt.plot(x_coord[::kol], y_coord[::kol], color='g')
+        x_new = x_coord[::kol]
+        y_new = y_coord[::kol]
+        if x_new[-1] != x_coord[-1]:
+            x_new.append(x_coord[-1])
+            y_new.append(y_coord[-1])
+        plt.plot(x_new, y_new, color='g')
     plt.show()

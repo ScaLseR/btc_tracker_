@@ -68,8 +68,6 @@ def get_min_request_api(start: datetime.date, end: datetime.date, num: int):
     storage = SqlStorage('test')
     if (end - start).days <= num:
         data_from_storage = storage.load_from_db(start, end)
-        print(len(data_from_storage))
-        print(data_from_storage)
         if (end - start).days == len(data_from_storage):
             draw_graph(data_from_storage)
         else:
