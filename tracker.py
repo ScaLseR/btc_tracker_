@@ -64,11 +64,13 @@ def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: in
 
 
 def get_min_request_api(start: datetime.date, end: datetime.date, num: int):
-    """Минимизируем количество завросов к API"""
+    """Минимизируем количество запросов к API"""
     storage = SqlStorage('test')
     if (end - start).days <= num:
         data_from_storage = storage.load_from_db(start, end)
-        if len(data_from_storage) == num:
+        print(len(data_from_storage))
+        print(data_from_storage)
+        if (end - start).days == len(data_from_storage):
             draw_graph(data_from_storage)
         else:
             api = BtcApi(num)
