@@ -18,9 +18,8 @@ def draw_graph(data: dict):
         plt.scatter(x_coord, y_coord, color='g')
     else:
         x_new = x_coord[::kol]
-        y_new = y_coord[::kol]
         if x_new[-1] != x_coord[-1]:
             x_new.append(x_coord[-1])
-            y_new.append(y_coord[-1])
-        plt.plot(x_new, y_new, color='g')
+        plt.plot(x_coord, y_coord, color='g')
+        plt.xticks(x_new, rotation='vertical')
     plt.show()
