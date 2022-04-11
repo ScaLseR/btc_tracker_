@@ -14,8 +14,6 @@ def draw_graph(data: dict):
         kol = 1
     else:
         kol = int(len(x_coord)/10)
-        print(len(x_coord))
-        print(kol)
     if len(x_coord) == 1:
         plt.scatter(x_coord, y_coord, color='g')
     else:

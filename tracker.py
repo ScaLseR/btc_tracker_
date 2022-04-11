@@ -63,6 +63,25 @@ def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: in
     draw_graph(storage.load_from_db(start, end))
 
 
+def get_min_request_api(start: datetime.date, end: datetime.date, num: int):
+    """Минимизируем количество завросов к API"""
+    storage = SqlStorage('test')
+    if (end - start).days <= num:
+        data_from_storage = storage.load_from_db(start, end)
+        if len(data_from_storage) == num:
+            draw_graph(data_from_storage)
+        else:
+            api = BtcApi(num)
+            data_from_api = api.load_start_end(start, end)
+            storage.save_to_db(data_from_api)
+            data_from_storage = storage.load_from_db(start, end)
+            draw_graph(data_from_storage)
+    else:
+        data_from_storage = storage.load_from_db(start, start + timedelta(days=num))
+        key_list = list(data_from_storage)
+        print(key_list)
+
+
 def get_args():
     """ Получаем и обрабатываем аргументы командной строки"""
     parser = argparse.ArgumentParser(description='BTC Tracker')
@@ -88,6 +107,10 @@ def get_args():
         if args.md and not args.fv and not args.mr:
             get_data_min_time_interval(convert_to_date(args.start),
                                        convert_to_date(args.end), args.n)
+        # отработка аргументов --start --end --n --mr с минимизацией количества запросов
+        if args.mr and not args.md and not args.fv:
+            get_min_request_api(convert_to_date(args.start),
+                                convert_to_date(args.end), args.n)
 
 
 if __name__ == "__main__":
