@@ -32,7 +32,8 @@ def get_data_by_time_interval(start: datetime.date, end: datetime.date, num: int
         api = BtcApi(num)
         data_from_api = api.load_start_end(start, end)
         storage.save_to_db(data_from_api)
-        draw_graph(data_from_api)
+        data_from_storage = storage.load_from_db(start, end)
+        draw_graph(data_from_storage)
 
 
 def convert_to_date(arg: str) -> datetime.date:
