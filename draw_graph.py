@@ -8,5 +8,16 @@ def draw_graph(data: dict):
     plt.xlabel('Дата')
     plt.ylabel('Цена')
     plt.grid(False)
-    plt.plot(list(data.keys()), data.values(), color='g')
+    x_coord = list(data.keys())
+    y_coord = list(data.values())
+    if len(x_coord) <= 10:
+        kol = 1
+    else:
+        kol = int(len(x_coord)/10)
+        print(len(x_coord))
+        print(kol)
+    if len(x_coord) == 1:
+        plt.scatter(x_coord, y_coord, color='g')
+    else:
+        plt.plot(x_coord[::kol], y_coord[::kol], color='g')
     plt.show()
