@@ -66,34 +66,45 @@ def get_data_min_time_interval(start: datetime.date, end: datetime.date, num: in
 def get_min_request_api(start: datetime.date, end: datetime.date, num: int):
     """Минимизируем количество запросов к API"""
     storage = SqlStorage('test')
-    if (end - start).days <= num:
-        data_from_storage = storage.load_from_db(start, end)
-        if (end - start).days == len(data_from_storage):
-            draw_graph(data_from_storage)
-        else:
-            api = BtcApi(num)
-            data_from_api = api.load_start_end(start, end)
-            storage.save_to_db(data_from_api)
+    api = BtcApi(num)
+    new_start = start
+    while new_start < end:
+        if (end - new_start).days <= num:
             data_from_storage = storage.load_from_db(start, end)
-            draw_graph(data_from_storage)
-    else:
-        new_start = start
-        while True:
+            if (end - start).days == len(data_from_storage):
+                draw_graph(data_from_storage)
+                break
+            else:
+                data_from_api = api.load_start_end(new_start, end)
+                storage.save_to_db(data_from_api)
+                data_from_storage = storage.load_from_db(start, end)
+                draw_graph(data_from_storage)
+                break
+        else:
             data_from_storage = storage.load_from_db(new_start, new_start + timedelta(days=num))
             if len(data_from_storage) == 0:
-                api = BtcApi(num)
-                data_from_api = api.load_start_end(new_start, new_start + timedelta(days=num))
-                storage.save_to_db(data_from_api)
+                if new_start + timedelta(days=num) <= end:
+                    data_from_api = api.load_start_end(new_start, new_start + timedelta(days=num))
+                    storage.save_to_db(data_from_api)
             if len(data_from_storage) == num:
-                new_start = new_start + timedelta(days=num)
+                if new_start + timedelta(days=num) <= end:
+                    new_start = new_start + timedelta(days=num)
             if 0 < len(data_from_storage) < num:
-                if new_start == data_from_storage[0]:
-                    i = 0
-                    while (data_from_storage[i + 1] - data_from_storage[i]).days == 1:
-                        i += 1
-                    print(i)
                 key_list = list(data_from_storage)
-                print(key_list)
+                if new_start == convert_to_date(key_list[0]):
+                    i = 0
+                    for i in range(len(key_list) - 1):
+                        if (convert_to_date(key_list[i + 1]) - convert_to_date(
+                                key_list[i])).days == 1:
+                            i += 1
+                        else:
+                            break
+                    new_start = convert_to_date(key_list[i])
+                if new_start + timedelta(days=num) <= end:
+                    data_from_api = api.load_start_end(new_start, new_start + timedelta(days=num))
+                else:
+                    data_from_api = api.load_start_end(new_start, end)
+                storage.save_to_db(data_from_api)
 
 
 def get_args():
